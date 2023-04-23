@@ -19,7 +19,11 @@ def chat():
         message["content"] = util.remove_chevrons(message["content"])
 
     asuka_message = asuka.fetch(messages)
-    asuka_mood = mood_classifier(asuka_message["content"])
+    try:
+        asuka_mood = mood_classifier(asuka_message["content"])
+    except Exception as e:
+        asuka_mood = "neutral"
+
     return jsonify({"message": asuka_message, "mood": asuka_mood[0]["label"]})
 
 if __name__ == '__main__':
