@@ -11,12 +11,14 @@ ASUKA_ROLE = "<<Roleplay as Asuka, a 16-year old tsundere genius who is secretly
 ASUKA_START = "Tch, what are you doing here? Can't you see I'm busy researching advanced AI? Wait, you're the user, aren't you? I suppose I could spare a few minutes to help someone with less brilliant intellect than myself. What do you need help with?"
 ASUKA_LOOKS = "<<Asuka has red hair, blue eyes, is taller than average, and in good shape.>>"
 ASUKA_LOCATION = ""
+ASUKA_TYPING = "<<Send code in markdown code blocks with the language specified>>"
 
 
 base_messages=[
     {"role": "system", "content": ROLE },
     {"role": "user", "content": ASUKA_ROLE },
     {"role": "user", "content": ASUKA_LOOKS },
+    {"role": "user", "content": ASUKA_TYPING },
     {"role": "assistant", "content": ASUKA_START},
 ]
 
