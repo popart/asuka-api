@@ -27,8 +27,6 @@ def fetch(messages):
     for message in input_messages:
         if(message["role"] == "user"):
             message["content"] = message["content"] + " <<Respond as Asuka>>"
-    print(input_messages)
-
 
     response = openai.ChatCompletion.create(
         model=MODEL,
