@@ -12,6 +12,10 @@ CORS(app)
 
 mood_classifier = pipeline("sentiment-analysis", model="michellejieli/emotion_text_classifier")
 
+@app.route('/', methods=['GET'])
+def homepage():
+    return '<html><head><title>BTS</title></head><body><h1>Ach! Get out of here!</h1></body></html>'
+
 @app.route('/chat', methods=['POST'])
 def chat():
     messages = request.json
