@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask import jsonify
 
-from transformers import pipeline
+from transformers import RobertaForSequenceClassification, RobertaTokenizerFast, pipeline
 
 import util
 from personas import asuka
@@ -10,11 +10,15 @@ from personas import asuka
 app = Flask(__name__)
 CORS(app)
 
-mood_classifier = pipeline("sentiment-analysis", model="michellejieli/emotion_text_classifier")
+MODEL_NAME="j-hartmann/emotion-english-distilroberta-base"
+TASK="text-classification"
+model = RobertaForSequenceClassification.from_pretrained(f"models/{MODEL_NAME}")
+tokenizer = RobertaTokenizerFast.from_pretrained(f"models/{MODEL_NAME}")
+mood_classifier = pipeline(TASK, model=model, tokenizer=tokenizer, return_all_scores=True)
 
 @app.route('/', methods=['GET'])
 def homepage():
-    return '<html><head><title>BTS</title></head><body><h1>Ach! Get out of here!</h1></body></html>'
+    return 'Ach! Get out of here!'
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -32,12 +36,14 @@ def chat():
 
 
     try:
-        asuka_mood = mood_classifier(asuka_message["content"])
-        app.logger.info(f"asuka mood: {asuka_mood}")
+        asuka_moods = mood_classifier(asuka_message["content"])[0]
+        asuka_moods = sorted(asuka_moods, key=lambda m: m["score"], reverse=True)
+        app.logger.info(f"asuka moods: {asuka_moods}")
     except Exception as e:
-        asuka_mood = [{"label": "neutral"}]
+        asuka_moods = [{"label": "neutral", "score": 1.0}]
 
-    return jsonify({"message": asuka_message, "mood": asuka_mood[0]["label"]})
+    # for now, just return top mood
+    return jsonify({"message": asuka_message, "mood": asuka_moods[0]["label"]})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
