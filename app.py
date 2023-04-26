@@ -32,7 +32,8 @@ def chat():
         asuka_message = asuka.fetch(messages)
         app.logger.info(f"asuka response: {asuka_message}")
     except Exception as e:
-        return jsonify({"message": "<ERROR: CONNECTION INTERRUPTED>", "mood": "neutral"})
+        print(e)
+        return jsonify({"message": {"content": "<ERROR: CONNECTION INTERRUPTED>", "role": "assistant"}, "mood": "neutral"})
 
 
     try:
