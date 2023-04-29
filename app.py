@@ -5,7 +5,8 @@ from flask import jsonify
 from transformers import RobertaForSequenceClassification, RobertaTokenizerFast, pipeline
 
 import util
-from personas import asuka
+from personas import asuka, grog, persona
+
 
 app = Flask(__name__)
 CORS(app)
@@ -16,35 +17,39 @@ model = RobertaForSequenceClassification.from_pretrained(f"models/{MODEL_NAME}")
 tokenizer = RobertaTokenizerFast.from_pretrained(f"models/{MODEL_NAME}")
 mood_classifier = pipeline(TASK, model=model, tokenizer=tokenizer, return_all_scores=True)
 
+personas = {
+    "asuka": asuka.asuka,
+    "grog": grog.grog,
+    "custom": persona.model_persona,
+}
+
 @app.route('/', methods=['GET'])
 def homepage():
-    return 'Ach! Get out of here!'
+    return 'Ack! What are you doing back here?!'
 
-@app.route('/chat', methods=['POST'])
-def chat():
+@app.route('/chat/<persona_name>', methods=['POST'])
+def chat(persona_name):
     messages = request.json
-    app.logger.info(f"chat input messages: {messages}")
-
-    for message in messages:
-        message["content"] = util.remove_chevrons(message["content"])
+    app.logger.info(f"{persona_name} - chat input messages: {messages}")
+    persona = personas[persona_name]
 
     try:
-        asuka_message = asuka.fetch(messages)
-        app.logger.info(f"asuka response: {asuka_message}")
+        asst_message = persona.fetch(messages)
+        app.logger.info(f"asst response: {asst_message}")
     except Exception as e:
         print(e)
         return jsonify({"message": {"content": "<ERROR: CONNECTION INTERRUPTED>", "role": "assistant"}, "mood": "neutral"})
 
 
     try:
-        asuka_moods = mood_classifier(asuka_message["content"])[0]
-        asuka_moods = sorted(asuka_moods, key=lambda m: m["score"], reverse=True)
-        app.logger.info(f"asuka moods: {asuka_moods}")
+        asst_moods = mood_classifier(asst_message["content"])[0]
+        asst_moods = sorted(asst_moods, key=lambda m: m["score"], reverse=True)
+        app.logger.info(f"asst moods: {asst_moods}")
     except Exception as e:
-        asuka_moods = [{"label": "neutral", "score": 1.0}]
+        asst_moods = [{"label": "neutral", "score": 1.0}]
 
     # for now, just return top mood
-    return jsonify({"message": asuka_message, "mood": asuka_moods[0]["label"]})
+    return jsonify({"message": asst_message, "mood": asst_moods[0]["label"]})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
