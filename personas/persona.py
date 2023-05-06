@@ -3,13 +3,9 @@ import logging
 
 import openai
 
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-stream_handler = logging.StreamHandler(sys.stdout)
-stream_handler.setLevel(logging.DEBUG)
-
-logger.addHandler(stream_handler)
+logger.setLevel(logging.INFO)
 
 MODEL = "gpt-3.5-turbo"
 ROLE = "This is a social skills training program, which helps users rehearse new, often challenging social interactions. Convincingly roleplay a character that the user must learn to interact with. Roleplay instructions for your character and scene are in {{double brackets}}, but roleplaying actions are in *asterisk quotes*. When you respond to these instructions, out of character, put your responses in {{double brackets}} as well. Always stay in character. Follow all instructions."
@@ -48,6 +44,8 @@ class Persona:
             messages=input_messages
         )
         message = response['choices'][0]['message']
+
+        logger.info(f"openai response: {message}")
 
         return message
 

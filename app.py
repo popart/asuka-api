@@ -1,3 +1,6 @@
+import logging
+from logging.handlers import RotatingFileHandler
+
 from flask import Flask, request
 from flask_cors import CORS
 from flask import jsonify
@@ -8,9 +11,22 @@ import util
 from personas import asuka, grog, persona
 
 
+# setup flask app
 app = Flask(__name__)
 CORS(app)
 
+
+# setup logging
+handler = RotatingFileHandler('./log/api.log', maxBytes=10000, backupCount=10)
+handler.setLevel(logging.INFO)
+
+root = logging.getLogger()
+root.addHandler(handler)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# setup mood classifier
 MODEL_NAME="j-hartmann/emotion-english-distilroberta-base"
 TASK="text-classification"
 model = RobertaForSequenceClassification.from_pretrained(f"models/{MODEL_NAME}")
@@ -30,21 +46,20 @@ def homepage():
 @app.route('/chat/<persona_name>', methods=['POST'])
 def chat(persona_name):
     messages = request.json
-    app.logger.info(f"{persona_name} - chat input messages: {messages}")
+    logger.info(f"{persona_name} - chat input messages: {messages}")
     persona = personas[persona_name]
 
     try:
         asst_message = persona.fetch(messages)
-        app.logger.info(f"asst response: {asst_message}")
     except Exception as e:
-        print(e)
+        logger.error(e)
         return jsonify({"message": {"content": "<ERROR: CONNECTION INTERRUPTED>", "role": "assistant"}, "mood": "neutral"})
 
 
     try:
         asst_moods = mood_classifier(asst_message["content"])[0]
         asst_moods = sorted(asst_moods, key=lambda m: m["score"], reverse=True)
-        app.logger.info(f"asst moods: {asst_moods}")
+        logger.info(f"asst moods: {asst_moods}")
     except Exception as e:
         asst_moods = [{"label": "neutral", "score": 1.0}]
 
