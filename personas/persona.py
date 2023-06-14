@@ -7,7 +7,9 @@ import openai
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-MODEL = "gpt-3.5-turbo"
+#MODEL = "gpt-3.5-turbo"
+MODEL = "gpt-3.5-turbo-0613"
+#MODEL = "gpt-4"
 ROLE = "This is a social skills training program, which helps users rehearse new, often challenging social interactions. Convincingly roleplay a character that the user must learn to interact with. Roleplay instructions for your character and scene are in {{double brackets}}, but roleplaying actions are in *asterisk quotes*. When you respond to these instructions, out of character, put your responses in {{double brackets}} as well. Always stay in character. Follow all instructions."
 
 BASE_MESSAGES=[
