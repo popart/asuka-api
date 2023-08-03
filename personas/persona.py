@@ -1,35 +1,68 @@
 import sys
 import logging
 
-import openai
+from vertexai.preview.language_models import ChatModel, InputOutputTextPair
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-#MODEL = "gpt-3.5-turbo"
-#MODEL = "gpt-3.5-turbo-0613"
-MODEL = "gpt-4"
+MODEL = "chat-bison@001"
+
+parameters = {
+    "temperature": .2,
+    "max_output_tokens": 256,
+    "top_p": 0.95,
+    "top_k": 40,
+}
+
 ROLE = "This is a social skills training program, which helps users rehearse new, often challenging social interactions. Convincingly roleplay a character that the user must learn to interact with. Roleplay instructions for your character and scene are in {{double brackets}}, but roleplaying actions are in *asterisk quotes*. When you respond to these instructions, out of character, put your responses in {{double brackets}} as well. Always stay in character. Follow all instructions."
 
-BASE_MESSAGES=[
-    {"role": "system", "content": ROLE },
-]
+context = ROLE
+chat_model = ChatModel.from_pretrained("chat-bison@001")
+
+def message_list_to_text_pairs(messages):
+    turn = "input"
+    buildup = {}
+    pairs = []
+    for m in messages:
+        if m["role"] == "user" and turn == "input":
+            buildup["input_text"] = m["content"]
+            turn = "output"
+        if m["role"] == "assistant" and turn == "output":
+            buildup["output_text"] = m["content"]
+            turn = "input"
+        if buildup.get("input_text") and buildup.get("output_text"):
+            pairs.append(InputOutputTextPair(
+                input_text=buildup["input_text"],
+                output_text=buildup["output_text"],
+            ))
+            buildup = {}
+
+    if buildup.get("input_text") and buildup.get("output_text"):
+        pairs.append(InputOutputTextPair(
+            input_text=buildup["input_text"],
+            output_text=buildup["output_text"],
+        ))
+
+    return pairs
+
+            
 
 class Persona:
 
     def __init__(self, name=None, scene=None, examples=None):
-        self.base_messages = BASE_MESSAGES.copy()
+        self.base_messages = []
+        self.context = ROLE
         if scene:
-            self.base_messages.append({"role": "user", "content": f"{{{{ {scene} }}}}"})
+            self.context += scene
         if examples:
-            self.base_messages += examples
+            self.base_messages += message_list_to_text_pairs(examples)
 
         if name:
             self.reminder = " {{Respond as %s.}}" % name
         else:
             self.reminder = " {{Respond in character.}}"
-
 
 
     def fetch(self, messages):
@@ -38,15 +71,23 @@ class Persona:
         for message in messages:
             if(message["role"] == "user"):
                 message["content"] = message["content"] + self.reminder
-        input_messages = self.base_messages.copy() + messages
+        input_messages = self.base_messages.copy() + message_list_to_text_pairs(messages)
 
         logger.info(f"openai post: {input_messages}")
 
-        response = openai.ChatCompletion.create(
-            model=MODEL,
-            messages=input_messages
+        chat = chat_model.start_chat(
+            context=self.context,
+            examples=input_messages
         )
-        message = response['choices'][0]['message']
+
+        response = chat.send_message(
+            messages[-1]["content"], **parameters
+        )
+
+        message = {
+            "content": response.text,
+            "role": "assistant",
+        }
 
         logger.info(f"openai response: {message}")
 
