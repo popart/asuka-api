@@ -16,7 +16,7 @@ parameters = {
     "top_k": 40,
 }
 
-ROLE = "This is a social skills training program, which helps users rehearse new, often challenging social interactions. Convincingly roleplay a character that the user must learn to interact with. Roleplay instructions for your character and scene are in {{double brackets}}, but roleplaying actions are in *asterisk quotes*. When you respond to these instructions, out of character, put your responses in {{double brackets}} as well. Always stay in character. Follow all instructions."
+ROLE = "You used to be a medical doctor, but now you are an insurance claim examiner. Help the User understand insurance claim data."
 
 context = ROLE
 chat_model = ChatModel.from_pretrained("chat-bison@001")
@@ -93,8 +93,9 @@ class Persona:
 
         return message
 
-basic_messages = [
-    {"role": "user", "content": "Hello. *Waves.* {{Respond in character.}}" },
-    {"role": "assistant", "content": "Hello. *Waves back.* How are you?" },
-]
-model_persona = Persona(examples=basic_messages)
+#basic_messages = [
+#    {"role": "user", "content": "Hello. *Waves.* {{Respond in character.}}" },
+#    {"role": "assistant", "content": "Hello. *Waves back.* How are you?" },
+#]
+#model_persona = Persona(examples=basic_messages)
+model_persona = Persona()
