@@ -8,7 +8,7 @@ from flask import jsonify
 from transformers import RobertaForSequenceClassification, RobertaTokenizerFast, pipeline
 
 import util
-from personas import asuka, grog, persona
+from personas import asuka, grog, hermione, persona
 
 
 # setup flask app
@@ -36,6 +36,7 @@ mood_classifier = pipeline(TASK, model=model, tokenizer=tokenizer, return_all_sc
 personas = {
     "asuka": asuka.asuka,
     "grog": grog.grog,
+    "hermione": hermione.persona,
     "custom": persona.model_persona,
 }
 
