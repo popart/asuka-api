@@ -1,59 +1,72 @@
 import sys
 import logging
+import uuid
 
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 #MODEL = "gpt-3.5-turbo"
-#MODEL = "gpt-3.5-turbo-0613"
-MODEL = "gpt-4"
-ROLE = "This is a social skills training program, which helps users rehearse new, often challenging social interactions. Convincingly roleplay a character that the user must learn to interact with. Roleplay instructions for your character and scene are in {{double brackets}}, but roleplaying actions are in *asterisk quotes*. When you respond to these instructions, out of character, put your responses in {{double brackets}} as well. Always stay in character. Follow all instructions."
+#MODEL = "gpt-4"
+MODEL = "gpt-4-1106-preview" # gpt-4 turbo
 
-BASE_MESSAGES=[
-    {"role": "system", "content": ROLE },
-]
+BASE_ROLE = ""
+BASE_COMPLIANCE = ""
 
 class Persona:
 
-    def __init__(self, name=None, scene=None, examples=None):
-        self.base_messages = BASE_MESSAGES.copy()
-        if scene:
-            self.base_messages.append({"role": "user", "content": f"{{{{ {scene} }}}}"})
+    def __init__(self, name=None, role=None, examples=None):
+        self.base_messages = []
+        if role:
+            self.base_messages.append({"role": "system", "content": role })
+        else:
+            self.base_messages.append({"role": "system", "content": BASE_ROLE })
+            #self.base_messages.append({"role": "assistant", "content": BASE_COMPLIANCE })
+
+
         if examples:
             self.base_messages += examples
-
-        if name:
-            self.reminder = " {{Respond as %s.}}" % name
-        else:
-            self.reminder = " {{Respond in character.}}"
-
 
 
     def fetch(self, messages):
         """takes a list of messages and returns chat output"""
-        messages = messages[-20:]
-        for message in messages:
-            if(message["role"] == "user"):
-                message["content"] = message["content"] + self.reminder
+        # check for instruction messages
+        system_messages = []
+        chat_messages = []
+        for m in messages:
+            if m["content"].startswith("{{") and m["content"].endswith("}}"):
+                m["role"] = "system"
+                m["content"] = m["content"][2:-2]
+                system_messages.append(m)
+            else:
+                chat_messages.append(m)
+
+        messages = system_messages + chat_messages[-40:]
+            
         input_messages = self.base_messages.copy() + messages
 
         logger.info(f"openai post: {input_messages}")
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=MODEL,
-            messages=input_messages
+            messages=input_messages,
+            frequency_penalty=0.5,
+            presence_penalty=0.5,
+            temperature=0.5,
+            user=str(uuid.uuid4())
         )
-        message = response['choices'][0]['message']
+
+        message = {
+            "content": response.choices[0].message.content,
+            "role": response.choices[0].message.role,
+        }
 
         logger.info(f"openai response: {message}")
 
         return message
 
-basic_messages = [
-    {"role": "user", "content": "Hello. *Waves.* {{Respond in character.}}" },
-    {"role": "assistant", "content": "Hello. *Waves back.* How are you?" },
-]
-model_persona = Persona(examples=basic_messages)
+model_persona = Persona()
