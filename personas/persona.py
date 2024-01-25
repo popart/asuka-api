@@ -14,19 +14,18 @@ logger.setLevel(logging.INFO)
 #MODEL = "gpt-4"
 MODEL = "gpt-4-1106-preview" # gpt-4 turbo
 
-BASE_ROLE = ""
-BASE_COMPLIANCE = ""
+BASE_ROLE = "User will give you a role and you will respond in that role. Respond directly in character. Do not provide narrative."
+BASE_COMPLIANCE = "[Understand. Please give me my role, and then I will respond in that role going forward.]"
 
 class Persona:
 
-    def __init__(self, name=None, role=None, examples=None):
+    def __init__(self, name=None, role=None, compliance=None, examples=None):
         self.base_messages = []
-        if role:
-            self.base_messages.append({"role": "system", "content": role })
-        else:
-            self.base_messages.append({"role": "system", "content": BASE_ROLE })
-            #self.base_messages.append({"role": "assistant", "content": BASE_COMPLIANCE })
+        self.base_messages.append({"role": "system", "content": BASE_ROLE })
+        self.base_messages.append({"role": "assistant", "content": BASE_COMPLIANCE })
 
+        if role:
+            self.base_messages.append({"role": "user", "content": role })
 
         if examples:
             self.base_messages += examples

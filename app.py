@@ -1,3 +1,4 @@
+import os
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -17,11 +18,12 @@ CORS(app)
 
 
 # setup logging
-handler = RotatingFileHandler('./log/api.log', maxBytes=10000, backupCount=10)
-handler.setLevel(logging.INFO)
+if os.getenv("DEBUG"):
+    handler = RotatingFileHandler('./log/api.log', maxBytes=10000, backupCount=10)
+    handler.setLevel(logging.INFO)
 
-root = logging.getLogger()
-root.addHandler(handler)
+    root = logging.getLogger()
+    root.addHandler(handler)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -55,7 +57,6 @@ def chat(persona_name):
     except Exception as e:
         logger.error(e)
         return jsonify({"message": {"content": "<ERROR: CONNECTION INTERRUPTED>", "role": "assistant"}, "mood": "neutral"})
-
 
     try:
         asst_moods = mood_classifier(asst_message["content"])[0]
