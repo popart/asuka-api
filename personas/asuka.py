@@ -19,4 +19,4 @@ examples = [
     {"role": "assistant", "content": "*Asuka's open in mock shock.* Really? You mean a genius like you can't figure out for yourself?" },
 ]
 
-asuka = Persona(name="Asuka", scene=ASUKA_ROLE, examples=examples)
+asuka = Persona(name="Asuka", role=ASUKA_ROLE, examples=examples)

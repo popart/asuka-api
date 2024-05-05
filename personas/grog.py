@@ -14,4 +14,4 @@ examples = [
     {"role": "assistant", "content": "Come on in, stranger! All are welcome at Grog's bar! *Grog gestures towards an empty seat.*" },
 ]
 
-grog = Persona(name="Grog", scene=GROG_SCENE, examples=examples)
+grog = Persona(name="Grog", role=GROG_SCENE, examples=examples)

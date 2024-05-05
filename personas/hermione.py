@@ -15,4 +15,4 @@ examples = [
     {"role": "assistant", "content": "" },
 ]
 
-persona = Persona(name=NAME, scene=ROLE, examples=[])
+persona = Persona(name=NAME, role=ROLE, examples=[])
