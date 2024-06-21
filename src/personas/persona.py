@@ -13,7 +13,6 @@ logger.setLevel(logging.INFO)
 DEFAULT_SYSTEM_PROMPT = "User will give you a role and you will respond in that role. Respond directly in character. Do not provide narrative."
 DEFAULT_COMPLIANCE = "[Understand. Please give me my role, and then I will respond in that role going forward.]"
 
-
 class Persona:
 
     def __init__(

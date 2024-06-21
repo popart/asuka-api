@@ -1,10 +1,3 @@
-import re
-import pickle
-
-import openai
-
-import util
-
 from personas.persona import Persona
 
 NAME = "Takina"

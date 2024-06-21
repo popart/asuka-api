@@ -6,16 +6,12 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask import jsonify
 
-from transformers import RobertaForSequenceClassification, RobertaTokenizerFast, pipeline
-
-import util
 from personas import asuka, grog, hermione, persona
 
 
 # setup flask app
 app = Flask(__name__)
 CORS(app)
-
 
 # setup logging
 if os.getenv("DEBUG"):
@@ -27,13 +23,6 @@ if os.getenv("DEBUG"):
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-# setup mood classifier
-MODEL_NAME="j-hartmann/emotion-english-distilroberta-base"
-TASK="text-classification"
-model = RobertaForSequenceClassification.from_pretrained(f"models/{MODEL_NAME}")
-tokenizer = RobertaTokenizerFast.from_pretrained(f"models/{MODEL_NAME}")
-mood_classifier = pipeline(TASK, model=model, tokenizer=tokenizer, return_all_scores=True)
 
 personas = {
     "asuka": asuka.asuka,
@@ -56,17 +45,9 @@ def chat(persona_name):
         asst_message = persona.fetch(messages)
     except Exception as e:
         logger.error(e)
-        return jsonify({"message": {"content": "<ERROR: CONNECTION INTERRUPTED>", "role": "assistant"}, "mood": "neutral"})
+        return jsonify({"message": {"content": "<ERROR: CONNECTION INTERRUPTED>", "role": "assistant"}})
 
-    try:
-        asst_moods = mood_classifier(asst_message["content"])[0]
-        asst_moods = sorted(asst_moods, key=lambda m: m["score"], reverse=True)
-        logger.info(f"asst moods: {asst_moods}")
-    except Exception as e:
-        asst_moods = [{"label": "neutral", "score": 1.0}]
-
-    # for now, just return top mood
-    return jsonify({"message": asst_message, "mood": asst_moods[0]["label"]})
+    return jsonify({"message": asst_message})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
