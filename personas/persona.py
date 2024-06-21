@@ -12,10 +12,13 @@ logger.setLevel(logging.INFO)
 
 #MODEL = "gpt-3.5-turbo"
 #MODEL = "gpt-4"
-MODEL = "gpt-4-1106-preview" # gpt-4 turbo
+#MODEL = "gpt-4-1106-preview" # gpt-4 turbo
+#MODEL = "gpt-4-turbo" # gpt-4 turbo
+MODEL = "gpt-4o" # gpt-4 turbo
 
 BASE_ROLE = "User will give you a role and you will respond in that role. Respond directly in character. Do not provide narrative."
 BASE_COMPLIANCE = "[Understand. Please give me my role, and then I will respond in that role going forward.]"
+
 
 class Persona:
 
@@ -55,12 +58,14 @@ class Persona:
             messages=input_messages,
             frequency_penalty=0.5,
             presence_penalty=0.5,
-            temperature=0.5,
-            user=str(uuid.uuid4())
+            temperature=0.0,
+            user=str(uuid.uuid4()),
         )
 
+        logger.info(response)
+
         message = {
-            "content": response.choices[0].message.content,
+            "content": response.choices[0].message.content or str(response.choices[0].message.tool_calls),
             "role": response.choices[0].message.role,
         }
 
