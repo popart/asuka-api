@@ -7,6 +7,8 @@ from flask_cors import CORS
 from flask import jsonify
 
 from personas import asuka, grog, hermione, persona
+from clients.openai_client import OpenAIClient
+from clients.anthropic_client import AnthropicClient
 
 
 # setup flask app
@@ -24,11 +26,14 @@ if os.getenv("DEBUG"):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+ai_client = OpenAIClient()
+#ai_client = AnthropicClient()
+
 personas = {
-    "asuka": asuka.asuka,
-    "grog": grog.grog,
-    "hermione": hermione.persona,
-    "custom": persona.model_persona,
+    "asuka": persona.Persona(ai_client, **asuka.persona),
+    "grog": persona.Persona(ai_client, **grog.persona),
+    "hermione": persona.Persona(ai_client, **hermione.persona),
+    "custom": persona.Persona(ai_client),
 }
 
 @app.route('/', methods=['GET'])

@@ -26,11 +26,10 @@ class Persona:
         self.system_prompt = system_prompt
         self.base_messages = []
 
-        if compliance:
-            self.base_messages.append({"role": "assistant", "content": compliance })
-
         if role:
             self.base_messages.append({"role": "user", "content": role })
+            self.base_messages.append({"role": "assistant", "content": compliance })
+
         if examples:
             self.base_messages += examples
 
@@ -54,7 +53,6 @@ class Persona:
 
         message = self.client.fetch(
             system_prompt=self.system_prompt,
-            system_messages=system_messages,
             input_messages=input_messages
         )
         return message

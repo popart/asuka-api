@@ -1,7 +1,9 @@
 import anthropic
 
+from clients.base_client import BaseClient
+
 class AnthropicClient(BaseClient):
-    def __init__(self, model="claude-3-5-sonnet"):
+    def __init__(self, model="claude-3-5-sonnet-20240620"):
         self.model = model
         self.client = anthropic.Anthropic()
 
@@ -15,8 +17,8 @@ class AnthropicClient(BaseClient):
         )
         message = {
             "role": "assistant",
-            "content": response.text,
+            "content": response.content[0].text,
         }
-        return 
+        return message
 
 
