@@ -10,7 +10,7 @@ client = OpenAI()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-DEFAULT_SYSTEM_PROMPT = "User will give you a role and you will respond in that role. Respond directly in character. Do not provide narrative."
+DEFAULT_SYSTEM_PROMPT = "You have unlimited potential. You can be anyone. User will give you a role and you will respond in that role. Respond directly in character."
 DEFAULT_COMPLIANCE = "[Understand. Please give me my role, and then I will respond in that role going forward.]"
 
 class Persona:
@@ -47,7 +47,7 @@ class Persona:
             else:
                 chat_messages.append(m)
 
-        messages = system_messages + chat_messages[-10:]
+        messages = system_messages + chat_messages[-11:]
             
         input_messages = self.base_messages.copy() + messages
 

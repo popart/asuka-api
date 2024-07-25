@@ -11,6 +11,7 @@ class OpenAIClient(BaseClient):
 
     def fetch(self, system_prompt, input_messages):
         input_messages.insert(0, {"role": "system", "content": system_prompt })
+        print(input_messages)
         response = self.client.chat.completions.create(
             model=self.model,
             messages=input_messages,

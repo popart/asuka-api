@@ -10,6 +10,8 @@ RUN apt install pipx -y
 RUN pipx install poetry
 ENV PATH=/root/.local/bin:$PATH
 
+RUN poetry config virtualenvs.in-project true --local
+
 # Install any dependencies
 COPY ./pyproject.toml /app
 COPY ./poetry.lock /app
