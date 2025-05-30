@@ -9,9 +9,13 @@ from flask import jsonify
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-from personas import asuka, grog, hermione, persona
+from dotenv import load_dotenv
+load_dotenv()  # take environment variables from local .env
+
+from personas import asuka, grog, hermione, sensei, persona
 from clients.openai_client import OpenAIClient
 from clients.anthropic_client import AnthropicClient
+
 
 # setup from env
 SESSION_SECRET_KEY = os.environ["SESSION_SECRET_KEY"]
@@ -48,6 +52,7 @@ personas = {
     "asuka": persona.Persona(ai_client, **asuka.persona),
     "grog": persona.Persona(ai_client, **grog.persona),
     "hermione": persona.Persona(ai_client, **hermione.persona),
+    "sensei": persona.Persona(ai_client, **sensei.persona),
     "custom": persona.Persona(ai_client),
 }
 
