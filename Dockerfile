@@ -20,9 +20,6 @@ RUN poetry install
 # Copy the content of the local src directory to the working directory
 COPY ./src /app
 
-# Specify the command to run on container start
-CMD [ "python", "./app.py" ]
-
 # Make port 5000 available to the world outside this container
 EXPOSE 5000/tcp
 

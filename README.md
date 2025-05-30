@@ -8,3 +8,12 @@ docker run -it -p 5000:5000 asuka-api:dev /bin/bash
 
 # docker build for deploy
 docker buildx build  --platform linux/amd64 -t us-docker.pkg.dev/kyoshi-dev/asuka/asuka-api:dev .
+
+# deploy
+gcloud auth application-default login
+docker push us-docker.pkg.dev/kyoshi-dev/asuka/asuka-api:dev
+(see https://cloud.google.com/artifact-registry/docs/docker/authentication if problems)
+
+in cloud run console, deploy the new image as an updated revision
+(make sure all the secrets are referenced)
+
