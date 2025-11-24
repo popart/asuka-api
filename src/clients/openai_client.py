@@ -5,7 +5,7 @@ from openai import OpenAI
 from clients.base_client import BaseClient
 
 class OpenAIClient(BaseClient):
-    def __init__(self, model="gpt-4o"):
+    def __init__(self, model="gpt-5.1"):
         self.model = model
         self.client = OpenAI()
 
