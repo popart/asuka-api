@@ -5,7 +5,7 @@ from openai import OpenAI
 from clients.base_client import BaseClient
 
 class OpenAIClient(BaseClient):
-    def __init__(self, model="gpt-5.1"):
+    def __init__(self, model="gpt-5-mini"):
         self.model = model
         self.client = OpenAI()
 
@@ -15,9 +15,11 @@ class OpenAIClient(BaseClient):
         response = self.client.chat.completions.create(
             model=self.model,
             messages=input_messages,
-            frequency_penalty=0.5,
-            presence_penalty=0.5,
-            temperature=0.0,
+            #frequency_penalty=0.5,
+            #presence_penalty=0.5,
+            #temperature=0.0,
+            reasoning_effort="low",
+            verbosity="low",
             user=str(uuid.uuid4()),
         )
         print(response)
