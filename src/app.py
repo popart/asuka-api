@@ -45,8 +45,8 @@ if os.getenv("DEBUG"):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-ai_client = OpenAIClient()
-#ai_client = AnthropicClient(model="claude-3-haiku-20240307")
+#ai_client = OpenAIClient()
+ai_client = AnthropicClient()
 
 personas = {
     "asuka": persona.Persona(ai_client, **asuka.persona),

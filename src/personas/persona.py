@@ -48,7 +48,7 @@ class Persona:
                 chat_messages.append(m)
 
         messages = system_messages + chat_messages[-11:]
-            
+
         input_messages = self.base_messages.copy() + messages
 
         message = self.client.fetch(
